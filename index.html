@@ -1,18 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Interactive Linux Distro Chooser</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 text-sans">
   <div id="app" class="max-w-4xl mx-auto p-6"></div>
 
   <script>
     // -----------------------
-    // DATA
+    // Configuration & Data
     // -----------------------
+    const STORAGE_KEY = 'distro-chooser-v1';
+
     const questions = [
       {
         id: 1,
@@ -61,105 +63,87 @@
       },
     ];
 
+    // extended distro data: added logo, based_on, package_manager
     const distros = {
-      mint: {
-        id: 'mint',
-        name: 'Linux Mint',
-        tagline: 'Friendly, Windows-like, great for beginners',
-        url: 'https://linuxmint.com',
-        pros: ['Very easy install', 'Cinnamon desktop: familiar UI', 'Great out-of-the-box codecs and drivers'],
-        cons: ['Not bleeding-edge', 'Less upstream focus on new GNOME features'],
-      },
-      ubuntu: {
-        id: 'ubuntu',
-        name: 'Ubuntu',
-        tagline: 'Popular, well-supported, strong hardware support',
-        url: 'https://ubuntu.com',
-        pros: ['Large community & documentation', 'Good hardware support', 'Lots of third-party apps support'],
-        cons: ['Canonical choices may not suit everyone', 'GNOME defaults can be opinionated'],
-      },
-      pop: {
-        id: 'pop',
-        name: 'Pop!_OS',
-        tagline: 'Designed for creators and gamers',
-        url: 'https://pop.system76.com',
-        pros: ['Excellent hybrid graphics support', 'Great defaults for productivity'],
-        cons: ['Developed by System76 — some choices are vendor-specific'],
-      },
-      fedora: {
-        id: 'fedora',
-        name: 'Fedora',
-        tagline: 'Cutting-edge free-software focus with polish',
-        url: 'https://getfedora.org',
-        pros: ['Fast release cycle', 'Upstream-friendly', 'GNOME-first experience'],
-        cons: ['Short lifecycle between releases', 'May need extra repos for some codecs'],
-      },
-      manjaro: {
-        id: 'manjaro',
-        name: 'Manjaro',
-        tagline: 'Arch-based, user-friendly experience',
-        url: 'https://manjaro.org',
-        pros: ['Access to Arch packages with easier install', 'Good hardware detection'],
-        cons: ['Rolling release maintenance required', 'Occasional package breakage'],
-      },
-      arch: {
-        id: 'arch',
-        name: 'Arch Linux',
-        tagline: 'DIY, bleeding edge, learn-by-doing',
-        url: 'https://archlinux.org',
-        pros: ['Complete control', 'Latest software', 'Excellent wiki'],
-        cons: ['Manual install & maintenance', 'Not for absolute beginners'],
-      },
-      debian: {
-        id: 'debian',
-        name: 'Debian',
-        tagline: 'The stable, reliable foundation',
-        url: 'https://www.debian.org',
-        pros: ['Rock-solid stability', 'Huge software archive'],
-        cons: ['Older default packages', 'Less beginner polish'],
-      },
-      zorin: {
-        id: 'zorin',
-        name: 'Zorin OS',
-        tagline: 'Windows-like experience tailored for newcomers',
-        url: 'https://zorin.com/os',
-        pros: ['Windows-like UI and transition tools', 'Good for ex-Windows users'],
-        cons: ['Some editions are paid', 'Smaller community'],
-      },
-      elementary: {
-        id: 'elementary',
-        name: 'elementary OS',
-        tagline: 'Polished, design-first experience',
-        url: 'https://elementary.io',
-        pros: ['Beautiful, consistent UI', 'Simple app store'],
-        cons: ['Less flexible by design', 'Some app gaps for power users'],
-      },
+      mint: { id:'mint', name:'Linux Mint', tagline:'Friendly, Windows-like, great for beginners', url:'https://linuxmint.com', logo:'https://linuxmint.com/favicon.png', based_on:'Ubuntu/Debian', package_manager:'apt (dpkg)', pros:['Very easy install','Cinnamon desktop: familiar UI','Great out-of-the-box codecs and drivers'], cons:['Not bleeding-edge','Less upstream focus on new GNOME features'] },
+      ubuntu: { id:'ubuntu', name:'Ubuntu', tagline:'Popular, well-supported, strong hardware support', url:'https://ubuntu.com', logo:'https://assets.ubuntu.com/v1/29985a98-ubuntu-logo32.png', based_on:'Debian', package_manager:'apt (dpkg)', pros:['Large community & documentation','Good hardware support','Lots of third-party apps support'], cons:['Canonical choices may not suit everyone','GNOME defaults can be opinionated'] },
+      pop: { id:'pop', name:'Pop!_OS', tagline:'Designed for creators and gamers', url:'https://pop.system76.com', logo:'https://pop.system76.com/assets/favicon-32x32.png', based_on:'Ubuntu', package_manager:'apt (dpkg)', pros:['Excellent hybrid graphics support','Great defaults for productivity'], cons:['Developed by System76 — some choices are vendor-specific'] },
+      fedora: { id:'fedora', name:'Fedora', tagline:'Cutting-edge free-software focus with polish', url:'https://getfedora.org', logo:'https://getfedora.org/static/images/favicons/favicon-32x32.png', based_on:'Independent (upstream Red Hat community)','package_manager':'dnf', pros:['Fast release cycle','Upstream-friendly','GNOME-first experience'], cons:['Short lifecycle between releases','May need extra repos for some codecs'] },
+      manjaro: { id:'manjaro', name:'Manjaro', tagline:'Arch-based, user-friendly experience', url:'https://manjaro.org', logo:'https://manjaro.org/img/favicon-32x32.png', based_on:'Arch Linux', package_manager:'pacman (with AUR helpers)', pros:['Access to Arch packages with easier install','Good hardware detection'], cons:['Rolling release maintenance required','Occasional package breakage'] },
+      arch: { id:'arch', name:'Arch Linux', tagline:'DIY, bleeding edge, learn-by-doing', url:'https://archlinux.org', logo:'https://archlinux.org/static/logos/archlinux-icon-crystal-64.png', based_on:'Independent','package_manager':'pacman', pros:['Complete control','Latest software','Excellent wiki'], cons:['Manual install & maintenance','Not for absolute beginners'] },
+      debian: { id:'debian', name:'Debian', tagline:'The stable, reliable foundation', url:'https://www.debian.org', logo:'https://www.debian.org/favicon.ico', based_on:'Independent','package_manager':'apt (dpkg)', pros:['Rock-solid stability','Huge software archive'], cons:['Older default packages','Less beginner polish'] },
+      zorin: { id:'zorin', name:'Zorin OS', tagline:'Windows-like experience tailored for newcomers', url:'https://zorin.com/os', logo:'https://assets.zorinos.com/brand/favicon-32.png', based_on:'Ubuntu', package_manager:'apt (dpkg)', pros:['Windows-like UI and transition tools','Good for ex-Windows users'], cons:['Some editions are paid','Smaller community'] },
+      elementary: { id:'elementary', name:'elementary OS', tagline:'Polished, design-first experience', url:'https://elementary.io', logo:'https://elementary.io/images/favicon.ico', based_on:'Ubuntu', package_manager:'apt (dpkg)', pros:['Beautiful, consistent UI','Simple app store'], cons:['Less flexible by design','Some app gaps for power users'] },
     };
 
     // -----------------------
-    // STATE
+    // State
     // -----------------------
     let step = 0;
     let answers = {};
 
+    // load saved state (if any)
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object') {
+          // basic validation
+          if (typeof parsed.step === 'number' && parsed.step >= 0 && parsed.step <= questions.length) step = parsed.step;
+          if (parsed.answers && typeof parsed.answers === 'object') {
+            // keep only valid question ids and option ids
+            const cleaned = {};
+            questions.forEach(q => {
+              const a = parsed.answers[q.id];
+              if (!a) return;
+              if (q.options.some(o => o.id === a)) cleaned[q.id] = a;
+            });
+            answers = cleaned;
+          }
+        }
+      } catch (e) {
+        console.warn('Could not load saved state', e);
+      }
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ step, answers }));
+      } catch (e) {
+        console.warn('Could not save state', e);
+      }
+    }
+
+    loadState();
+
+    // -----------------------
+    // Interaction helpers
+    // -----------------------
     function choose(questionId, optionId) {
-      answers[questionId] = optionId;
+      answers = { ...answers, [questionId]: optionId };
+      // advance automatically to the next question for smoother flow
+      if (step < questions.length) step = Math.min(step + 1, questions.length);
+      saveState();
       render();
     }
 
     function next() {
       step = Math.min(step + 1, questions.length);
+      saveState();
       render();
     }
 
     function prev() {
       step = Math.max(step - 1, 0);
+      saveState();
       render();
     }
 
     function restart() {
       step = 0;
       answers = {};
+      saveState();
       render();
     }
 
@@ -173,32 +157,57 @@
         const opt = q.options.find(o => o.id === picked);
         if (!opt) return;
         Object.entries(opt.weights).forEach(([d, w]) => {
-          scores[d] += w;
+          scores[d] = (scores[d] || 0) + w;
         });
       });
 
       return scores;
     }
 
+    // build a "why" explanation for a given distro id
+    function buildWhyFor(distroId) {
+      // gather contributions per question
+      const contributions = [];
+      questions.forEach(q => {
+        const picked = answers[q.id];
+        if (!picked) return;
+        const opt = q.options.find(o => o.id === picked);
+        if (!opt) return;
+        const weight = opt.weights[distroId] || 0;
+        if (weight > 0) {
+          contributions.push({ question: q.q, answerLabel: opt.label, weight });
+        }
+      });
+      // sort by weight descending
+      contributions.sort((a, b) => b.weight - a.weight);
+      return contributions;
+    }
+
+    // -----------------------
+    // Render
+    // -----------------------
     function render() {
       const container = document.getElementById('app');
+
+      // header
+      const headerHtml = `
+        <header class="mb-6">
+          <h1 class="text-3xl font-bold">Interactive Linux Distro Chooser</h1>
+          <p class="text-gray-600 mt-2">Quickly find the distro that fits you — your progress is saved locally.</p>
+        </header>
+      `;
 
       if (step < questions.length) {
         const q = questions[step];
         const progress = Math.round(Object.keys(answers).length / questions.length * 100);
 
-        container.innerHTML = `
-          <header class="mb-6">
-            <h1 class="text-3xl font-bold">Interactive Linux Distro Chooser</h1>
-            <p class="text-gray-600 mt-2">Answer a few quick questions and get a recommended distro + explanation.</p>
-          </header>
-
+        container.innerHTML = `${headerHtml}
           <main class="bg-white rounded-2xl shadow p-6">
             <div>
               <div class="flex items-center justify-between mb-4">
                 <div>
                   <div class="text-sm text-gray-500">Question ${step + 1} of ${questions.length}</div>
-                  <h2 class="text-xl font-semibold mt-1">${q.q}</h2>
+                  <h2 class="text-xl font-semibold mt-1">${escapeHtml(q.q)}</h2>
                 </div>
                 <div class="text-sm text-gray-500">Progress: ${progress}%</div>
               </div>
@@ -206,10 +215,13 @@
               <div class="grid gap-3 md:grid-cols-1">
                 ${q.options.map(opt => `
                   <button
-                    class="text-left p-4 rounded-lg border transition-shadow hover:shadow-md ${answers[q.id] === opt.id ? 'border-blue-500 ring-2 ring-blue-100' : 'border-gray-200'}"
+                    aria-pressed="${answers[q.id] === opt.id}"
+                    tabindex="0"
+                    onkeydown="if(event.key==='Enter' || event.key===' ') { event.preventDefault(); choose(${q.id}, '${opt.id}') }"
                     onclick="choose(${q.id}, '${opt.id}')"
+                    class="text-left p-4 rounded-lg border transition-shadow hover:shadow-md ${answers[q.id] === opt.id ? 'border-blue-500 ring-2 ring-blue-100' : 'border-gray-200'}"
                   >
-                    <div class="font-medium">${opt.label}</div>
+                    <div class="font-medium">${escapeHtml(opt.label)}</div>
                     <div class="text-xs text-gray-500 mt-1">(choice will influence recommendation)</div>
                   </button>
                 `).join('')}
@@ -227,59 +239,121 @@
         return;
       }
 
-      // -----------------------
       // RESULTS
-      // -----------------------
       const scores = computeScores();
       const sorted = Object.entries(scores)
         .map(([id, score]) => ({ id, score, ...distros[id] }))
         .sort((a, b) => b.score - a.score);
 
-      const top = sorted[0];
+      const topScore = sorted.length ? sorted[0].score : 0;
+      const topCandidates = sorted.filter(item => item.score === topScore && topScore > 0);
 
-      container.innerHTML = `
-        <header class="mb-6">
-          <h1 class="text-3xl font-bold">Your Linux Distro Matches</h1>
-          <p class="text-gray-600 mt-2">Based on your answers, here are the best fits.</p>
-        </header>
-
+      container.innerHTML = `${headerHtml}
         <main class="bg-white rounded-2xl shadow p-6">
-          <h2 class="text-2xl font-semibold">Top recommendations</h2>
+          <h2 class="text-2xl font-semibold">${topCandidates.length > 1 ? 'Top recommendations' : 'Top recommendation'}</h2>
+          <p class="text-gray-600 mt-1">Based on your answers, here are the best fits. Logos are shown where available.</p>
+
           <div class="mt-5 grid gap-4 md:grid-cols-2">
-            ${sorted.slice(0, 4).map(item => `
-              <div class="p-4 rounded-xl border ${item.id === top.id ? 'border-blue-400 shadow-lg' : 'border-gray-100'}">
-                <h3 class="font-bold text-lg">${item.name}</h3>
-                <div class="text-sm text-gray-500">${item.tagline}</div>
-                <div class="mt-2 text-sm font-semibold">Score: ${item.score}</div>
-                <ul class="mt-3 text-sm list-disc list-inside text-gray-700">
-                  ${item.pros.map(p => `<li>${p}</li>`).join('')}
-                </ul>
-                <div class="mt-3 flex gap-2">
-                  <a href="${item.url}" target="_blank" class="px-3 py-1 rounded bg-gray-100 border">Visit site</a>
-                  <button onclick="alert('${item.name}: ${item.tagline}')" class="px-3 py-1 rounded border">Quick tip</button>
+            ${sorted.slice(0, 6).map(item => `
+              <div class="p-4 rounded-xl border ${item.score === topScore && topScore>0 ? 'border-blue-400 shadow-lg' : 'border-gray-100'}">
+                <div class="flex items-start gap-4">
+                  <img src="${item.logo || ''}" alt="${escapeHtml(item.name)} logo" width="48" height="48" class="rounded" onerror="this.style.display='none'">
+                  <div class="flex-1">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <h3 class="font-bold text-lg">${escapeHtml(item.name)}</h3>
+                        <div class="text-sm text-gray-500">${escapeHtml(item.tagline)}</div>
+                        <div class="text-xs text-gray-500 mt-1">Based on: <strong>${escapeHtml(item.based_on || '—')}</strong> • Package manager: <strong>${escapeHtml(item.package_manager || '—')}</strong></div>
+                      </div>
+                      <div class="text-sm text-gray-700 font-semibold">Score: ${item.score}</div>
+                    </div>
+
+                    <ul class="mt-3 text-sm list-disc list-inside text-gray-700">
+                      ${item.pros.map(p => `<li>${escapeHtml(p)}</li>`).join('')}
+                    </ul>
+
+                    <div class="mt-3 flex gap-2">
+                      <a href="${item.url}" target="_blank" rel="noreferrer" class="px-3 py-1 rounded bg-gray-100 border">Visit site</a>
+                      <button onclick="alert('${escapeForAlert(item.name + ': ' + item.tagline)}')" class="px-3 py-1 rounded border">Quick tip</button>
+                    </div>
+                  </div>
                 </div>
               </div>
             `).join('')}
           </div>
 
-          <div class="mt-6 flex gap-3">
-            <button onclick="step=0; render();" class="px-4 py-2 rounded-lg border">Edit answers</button>
-            <button onclick="restart()" class="px-4 py-2 rounded-lg bg-blue-600 text-white">Start over</button>
-            <a href="${top.url}" target="_blank" class="ml-auto px-4 py-2 rounded-lg border">Go to top distro site</a>
+          <div class="mt-6 grid gap-4 md:grid-cols-2">
+            <div>
+              <div class="flex gap-3">
+                <button onclick="step=0; saveState(); render();" class="px-4 py-2 rounded-lg border">Edit answers</button>
+                <button onclick="restart()" class="px-4 py-2 rounded-lg bg-blue-600 text-white">Start over</button>
+                <div class="ml-auto text-sm text-gray-500 self-center">Progress saved locally. You can close the page and return later.</div>
+              </div>
+
+              <div class="mt-6">
+                <h4 class="font-semibold">Why this recommendation?</h4>
+                <p class="text-gray-600 mt-2">Below we show which answers contributed to the top choice(s). This helps you understand the reasoning and tweak your answers if you want a different result.</p>
+
+                ${topCandidates.length === 0 ? '<p class="text-gray-600 mt-2">No answers were recorded — try the quiz to get a recommendation.</p>' : ''}
+
+                ${topCandidates.map(tc => {
+                  const contributions = buildWhyFor(tc.id);
+                  if (contributions.length === 0) return `<div class=\"mt-4 p-3 border rounded\">No contributing answers for ${escapeHtml(tc.name)}.</div>`;
+                  return `
+                    <div class="mt-4 p-3 border rounded">
+                      <div class="flex items-center gap-3">
+                        <img src="${tc.logo || ''}" alt="${escapeHtml(tc.name)} logo" width="36" height="36" onerror="this.style.display='none'" />
+                        <div>
+                          <div class="font-semibold">${escapeHtml(tc.name)}</div>
+                          <div class="text-xs text-gray-500">Based on: <strong>${escapeHtml(tc.based_on || '—')}</strong> • Package manager: <strong>${escapeHtml(tc.package_manager || '—')}</strong></div>
+                        </div>
+                      </div>
+
+                      <ol class="mt-3 list-decimal list-inside text-sm text-gray-700">
+                        ${contributions.map(c => `<li><strong>"${escapeHtml(c.answerLabel)}"</strong> — from question: ${escapeHtml(c.question)} (contribution: ${c.weight})</li>`).join('')}
+                      </ol>
+
+                      <div class="mt-2 text-xs text-gray-500">Total score for ${escapeHtml(tc.name)}: <strong>${tc.score}</strong></div>
+                    </div>
+                  `;
+                }).join('')}
+
+              </div>
+            </div>
+
+            <div>
+              <h4 class="font-semibold">What to do next</h4>
+              <ul class="mt-3 text-sm list-disc list-inside text-gray-700">
+                <li>Try the top recommendation in a live USB ("Try without installing").</li>
+                <li>Read the distro's install guide (links above).</li>
+                <li>If multiple distros tied, consider which package manager or community you prefer.</li>
+              </ul>
+
+              <div class="mt-6 text-xs text-gray-500">Tip: you can clear saved progress with the "Start over" button.</div>
+            </div>
           </div>
 
-          <div class="mt-6">
-            <h4 class="font-semibold">Why this recommendation?</h4>
-            <p class="text-gray-600 mt-2">
-              ${top.name} scored highest because your answers favored 
-              <strong>${top.tagline.toLowerCase()}</strong>.
-              Use the links above to explore ISO downloads or installation guides.
-            </p>
-          </div>
         </main>
       `;
     }
 
+    // small helpers to avoid HTML injection in templates
+    function escapeHtml(str) {
+      if (!str && str !== 0) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function escapeForAlert(s) {
+      return String(s).replace(/'/g, "\'").replace(/
+/g, ' ');
+    }
+
+    // initial render
     render();
   </script>
 </body>
