@@ -68,10 +68,10 @@
       mint: { id:'mint', name:'Linux Mint', tagline:'Friendly, Windows-like, great for beginners', url:'https://linuxmint.com', logo:'https://linuxmint.com/favicon.png', based_on:'Ubuntu/Debian', package_manager:'apt (dpkg)', pros:['Very easy install','Cinnamon desktop: familiar UI','Great out-of-the-box codecs and drivers'], cons:['Not bleeding-edge','Less upstream focus on new GNOME features'] },
       ubuntu: { id:'ubuntu', name:'Ubuntu', tagline:'Popular, well-supported, strong hardware support', url:'https://ubuntu.com', logo:'https://assets.ubuntu.com/v1/29985a98-ubuntu-logo32.png', based_on:'Debian', package_manager:'apt (dpkg)', pros:['Large community & documentation','Good hardware support','Lots of third-party apps support'], cons:['Canonical choices may not suit everyone','GNOME defaults can be opinionated'] },
       pop: { id:'pop', name:'Pop!_OS', tagline:'Designed for creators and gamers', url:'https://pop.system76.com', logo:'https://pop.system76.com/assets/favicon-32x32.png', based_on:'Ubuntu', package_manager:'apt (dpkg)', pros:['Excellent hybrid graphics support','Great defaults for productivity'], cons:['Developed by System76 — some choices are vendor-specific'] },
-      fedora: { id:'fedora', name:'Fedora', tagline:'Cutting-edge free-software focus with polish', url:'https://getfedora.org', logo:'https://getfedora.org/static/images/favicons/favicon-32x32.png', based_on:'Independent (upstream Red Hat community)','package_manager':'dnf', pros:['Fast release cycle','Upstream-friendly','GNOME-first experience'], cons:['Short lifecycle between releases','May need extra repos for some codecs'] },
+      fedora: { id:'fedora', name:'Fedora', tagline:'Cutting-edge free-software focus with polish', url:'https://getfedora.org', logo:'https://getfedora.org/static/images/favicons/favicon-32x32.png', based_on:'Independent (upstream Red Hat community)', package_manager:'dnf', pros:['Fast release cycle','Upstream-friendly','GNOME-first experience'], cons:['Short lifecycle between releases','May need extra repos for some codecs'] },
       manjaro: { id:'manjaro', name:'Manjaro', tagline:'Arch-based, user-friendly experience', url:'https://manjaro.org', logo:'https://manjaro.org/img/favicon-32x32.png', based_on:'Arch Linux', package_manager:'pacman (with AUR helpers)', pros:['Access to Arch packages with easier install','Good hardware detection'], cons:['Rolling release maintenance required','Occasional package breakage'] },
-      arch: { id:'arch', name:'Arch Linux', tagline:'DIY, bleeding edge, learn-by-doing', url:'https://archlinux.org', logo:'https://archlinux.org/static/logos/archlinux-icon-crystal-64.png', based_on:'Independent','package_manager':'pacman', pros:['Complete control','Latest software','Excellent wiki'], cons:['Manual install & maintenance','Not for absolute beginners'] },
-      debian: { id:'debian', name:'Debian', tagline:'The stable, reliable foundation', url:'https://www.debian.org', logo:'https://www.debian.org/favicon.ico', based_on:'Independent','package_manager':'apt (dpkg)', pros:['Rock-solid stability','Huge software archive'], cons:['Older default packages','Less beginner polish'] },
+      arch: { id:'arch', name:'Arch Linux', tagline:'DIY, bleeding edge, learn-by-doing', url:'https://archlinux.org', logo:'https://archlinux.org/static/logos/archlinux-icon-crystal-64.png', based_on:'Independent', package_manager:'pacman', pros:['Complete control','Latest software','Excellent wiki'], cons:['Manual install & maintenance','Not for absolute beginners'] },
+      debian: { id:'debian', name:'Debian', tagline:'The stable, reliable foundation', url:'https://www.debian.org', logo:'https://www.debian.org/favicon.ico', based_on:'Independent', package_manager:'apt (dpkg)', pros:['Rock-solid stability','Huge software archive'], cons:['Older default packages','Less beginner polish'] },
       zorin: { id:'zorin', name:'Zorin OS', tagline:'Windows-like experience tailored for newcomers', url:'https://zorin.com/os', logo:'https://assets.zorinos.com/brand/favicon-32.png', based_on:'Ubuntu', package_manager:'apt (dpkg)', pros:['Windows-like UI and transition tools','Good for ex-Windows users'], cons:['Some editions are paid','Smaller community'] },
       elementary: { id:'elementary', name:'elementary OS', tagline:'Polished, design-first experience', url:'https://elementary.io', logo:'https://elementary.io/images/favicon.ico', based_on:'Ubuntu', package_manager:'apt (dpkg)', pros:['Beautiful, consistent UI','Simple app store'], cons:['Less flexible by design','Some app gaps for power users'] },
     };
@@ -349,7 +349,12 @@
     }
 
     function escapeForAlert(s) {
-      return String(s).replace(/'/g, "\'").replace(/
+      // Escape single quotes and convert newlines to spaces so the string is safe inside a single-quoted alert('...') call
+      return String(s)
+        .replace(/'/g, "\'")
+        .replace(/
+/g, ' ')
+        .replace(/
 /g, ' ');
     }
 
