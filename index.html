@@ -282,5 +282,20 @@
 
     render();
   </script>
+  <script>
+  (function() {
+    const workerUrl = "https://tiny-analytics.wautersstef4.workers.dev/"; // VERVANG DIT
+    
+    fetch(workerUrl, {
+      method: "POST",
+      body: JSON.stringify({
+        url: window.location.pathname,
+        ref: document.referrer,
+        width: window.innerWidth
+      }),
+      mode: 'no-cors' 
+    });
+  })();
+</script>
 </body>
 </html>
