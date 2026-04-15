@@ -282,18 +282,16 @@
 
     render();
   </script>
-  <script>
+<script>
   (function() {
-    const workerUrl = "https://tiny-analytics.wautersstef4.workers.dev/"; // VERVANG DIT
-    
-    fetch(workerUrl, {
+    fetch("https://tiny-analytics.wautersstef4.workers.dev", {
       method: "POST",
+      mode: "cors", // Dit is nu belangrijk!
       body: JSON.stringify({
         url: window.location.pathname,
         ref: document.referrer,
         width: window.innerWidth
-      }),
-      mode: 'no-cors' 
+      })
     });
   })();
 </script>
