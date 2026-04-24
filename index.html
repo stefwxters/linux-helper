@@ -286,7 +286,7 @@
   (function() {
     fetch("https://tiny-analytics.wautersstef4.workers.dev", {
       method: "POST",
-      mode: "cors", // Dit is nu belangrijk!
+      mode: "cors",
       body: JSON.stringify({
         url: window.location.pathname,
         ref: document.referrer,
